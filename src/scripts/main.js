@@ -1,52 +1,51 @@
 'use strict';
 
 (function () {
-  // pomocnicza funkcja: kapitalizacja pierwszej litery
+  // Funkcja do kapitalizacji pierwszej litery
   function cap(s) {
     return String(s).charAt(0).toUpperCase() + String(s).slice(1);
   }
 
-  // główna funkcja przyjmująca element <form>
+  // Funkcja poprawiająca formularz
   function fixForm(formEl) {
     if (!formEl || !formEl.querySelectorAll) return;
 
-    // wybieramy tylko realne pola (text, email, password, tel, number)
+    // Pobieramy wszystkie inputy z name, pomijamy buttony i hidden
     const fields = formEl.querySelectorAll(
-      'input[name]:not([type="submit"]):not([type="button"])' +
-      ':not([type="hidden"]), textarea[name], select[name]'
+      'input[name]:not([type="submit"]):not([type="button"]):not([type="hidden"])'
     );
 
-    Array.from(fields).forEach((fld) => {
-      const fldName = fld.getAttribute('name');
+    Array.from(fields).forEach((field) => {
+      const fldName = field.getAttribute('name');
       if (!fldName) return;
 
-      // jeśli przed polem już jest label z odpowiednim for, pomijamy
-      const prev = fld.previousElementSibling;
-      if (
+      // Sprawdzenie, czy label już istnieje
+      const prev = field.previousElementSibling;
+      const prevIsLabel =
         prev &&
         prev.tagName &&
         prev.tagName.toLowerCase() === 'label' &&
-        prev.getAttribute('for') === fld.id
-      ) {
-        if (!fld.placeholder) fld.placeholder = cap(fldName);
+        prev.getAttribute('for') === field.id;
+
+      if (prevIsLabel) {
+        if (!field.placeholder) field.placeholder = cap(fldName);
         return;
       }
 
+      // Tworzymy label
       const lbl = document.createElement('label');
       lbl.className = 'field-label';
-      if (fld.id) lbl.setAttribute('for', fld.id);
+      if (field.id) lbl.setAttribute('for', field.id);
       lbl.textContent = cap(fldName);
 
-      // wstaw label przed polem
-      fld.insertAdjacentElement('beforebegin', lbl);
+      // Wstawiamy label przed input
+      field.insertAdjacentElement('beforebegin', lbl);
 
-      // ustaw placeholder jeśli nie ma
-      if (!fld.placeholder) fld.placeholder = cap(fldName);
+      // Ustawiamy placeholder jeśli nie istnieje
+      if (!field.placeholder) field.placeholder = cap(fldName);
     });
   }
 
-  // expose function for tests
+  // Udostępniamy funkcję globalnie dla testów
   window.fixForm = fixForm;
 })();
-
-
