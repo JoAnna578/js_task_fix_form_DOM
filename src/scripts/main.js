@@ -1,28 +1,55 @@
 'use strict';
 
-// Define fixForm on window and do not auto-run anything in global scope.
-window.fixForm = function (formElement) {
-  // get inputs that have a name attribute
-  const inputs = Array.from(formElement.querySelectorAll('input[name]'));
+(function () {
+  function cap(str) {
+    const s = String(str);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
 
-  inputs.forEach((inp) => {
-    // avoid using variable names that shadow globals
-    const inpName = inp.name;
-    if (!inpName) return;
+  function fixForm(formEl) {
+    if (!formEl || !formEl.querySelectorAll) return;
 
-    // create label
-    const lbl = document.createElement('label');
-    lbl.className = 'field-label';
-    lbl.setAttribute('for', inp.id);
+    const selector =
+      'input[name]:not([type="submit"]):not([type="button"])' +
+      ':not([type="hidden"]), textarea[name], select[name]';
 
-    const labelText = inpName.charAt(0).toUpperCase() + inpName.slice(1);
-    lbl.textContent = labelText;
+    const fields = formEl.querySelectorAll(selector);
 
-    // insert label before input without assigning parent to a variable
-    inp.insertAdjacentElement('beforebegin', lbl);
+    Array.from(fields).forEach((fld) => {
+      const fldName = fld.getAttribute('name');
+      if (!fldName) return;
 
-    // set placeholder
-    inp.placeholder = labelText;
-  });
-};
+      const prev = fld.previousElementSibling;
+      const prevIsLabel =
+        prev &&
+        prev.tagName &&
+        prev.tagName.toLowerCase() === 'label' &&
+        prev.getAttribute('for') === fld.id;
+
+      if (prevIsLabel) {
+        if (!fld.placeholder) fld.placeholder = cap(fldName);
+        return;
+      }
+
+      const lbl = document.createElement('label');
+      lbl.className = 'field-label';
+      if (fld.id) lbl.setAttribute('for', fld.id);
+      lbl.textContent = cap(fldName);
+
+      fld.insertAdjacentElement('beforebegin', lbl);
+
+      if (!fld.placeholder) fld.placeholder = cap(fldName);
+    });
+  }
+
+  // automatyczne wywołanie dla wszystkich formularzy
+  const forms = document.querySelectorAll('form');
+  forms.forEach((form) => fixForm(form));
+
+  // eksport dla testów
+  window.fixForm = fixForm;
+})();
+
+ 
+
 
