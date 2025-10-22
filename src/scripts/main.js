@@ -37,16 +37,11 @@
       lbl.textContent = cap(fldName);
 
       fld.insertAdjacentElement('beforebegin', lbl);
-
       if (!fld.placeholder) fld.placeholder = cap(fldName);
     });
   }
 
-  // automatyczne wywołanie dla wszystkich formularzy
-  const forms = document.querySelectorAll('form');
-  forms.forEach((form) => fixForm(form));
-
-  // eksport dla testów
+  // tylko eksport — BEZ automatycznego wywołania
   window.fixForm = fixForm;
 })();
 
