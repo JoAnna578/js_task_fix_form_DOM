@@ -1,22 +1,29 @@
 'use strict';
 
 function fixForm(form) {
-  Array.from(form.elements).forEach((input) => {
-    if (!input.name) return;
+  // pobierz tylko inputy z name (bez checkboxów itp. bez name)
+  const inputs = Array.from(form.querySelectorAll('input[name]'));
+
+  inputs.forEach((input) => {
+    const name = input.name;
+    if (!name) return;
 
     const label = document.createElement('label');
     label.className = 'field-label';
     label.setAttribute('for', input.id);
-    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
 
-    // Wstawienie label przed input bez przypisywania parentNode do zmiennej
-    input.parentNode.insertBefore(label, input);
+    const text = name.charAt(0).toUpperCase() + name.slice(1);
+    label.textContent = text;
 
-    // Ustawienie placeholder
-    input.placeholder = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+    // Wstaw label bezpośrednio przed input (nie używamy parent/parentNode)
+    input.insertAdjacentElement('beforebegin', label);
+
+    // ustaw placeholder
+    input.placeholder = text;
   });
 }
 
+// Naprawa wszystkich formularzy na stronie
 document.querySelectorAll('form').forEach(fixForm);
 
 // Udostępnienie funkcji globalnie dla testów
