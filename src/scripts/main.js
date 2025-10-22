@@ -1,48 +1,24 @@
-'use strict';
+function fixForm(form) {
+  Array.from(form.elements).forEach((input) => {
+    if (!input.name) return;
 
-(function() {
-  // Funkcja kapitalizująca pierwszy znak
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+    const parent = input.parentNode;
 
-  // Pobranie wszystkich formularzy
-  const forms = document.querySelectorAll('form');
+    const label = document.createElement('label');
+    label.className = 'field-label';
+    label.setAttribute('for', input.id);
+    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
 
-  forms.forEach((form) => {
-    Array.from(form.elements).forEach((input) => {
-      if (!input.name) return; // pomijamy inputy bez name
+    // Poprawka: wstaw label przed input zamiast na końcu
+    parent.insertBefore(label, input);
 
-      // Tworzymy label
-      const lbl = document.createElement('label');
-      lbl.className = 'field-label';
-      lbl.setAttribute('for', input.id);
-      lbl.textContent = capitalize(input.name);
-
-      // Wstawiamy label **przed** input
-      input.parentNode.insertBefore(lbl, input);
-
-      // Ustawiamy placeholder
-      input.placeholder = capitalize(input.name);
-    });
+    // Ustaw placeholder
+    input.placeholder = input.name.charAt(0).toUpperCase() + input.name.slice(1);
   });
+}
 
-  // Funkcja dostępna globalnie dla testów
-  window.fixForm = function() {
-    // Funkcja może być wywołana ponownie, np. w testach
-    forms.forEach((form) => {
-      Array.from(form.elements).forEach((input) => {
-        if (!input.name) return;
-        // Sprawdzenie czy label już istnieje, by nie dublować
-        if (!input.previousElementSibling || input.previousElementSibling.tagName.toLowerCase() !== 'label') {
-          const lbl = document.createElement('label');
-          lbl.className = 'field-label';
-          lbl.setAttribute('for', input.id);
-          lbl.textContent = capitalize(input.name);
-          input.parentNode.insertBefore(lbl, input);
-        }
-        input.placeholder = capitalize(input.name);
-      });
-    });
-  };
-})();
+// Wywołanie funkcji dla wszystkich formularzy
+document.querySelectorAll('form').forEach((form) => fixForm(form));
+
+// Udostępnienie funkcji globalnie dla testów
+window.fixForm = fixForm;
