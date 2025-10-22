@@ -1,16 +1,16 @@
 'use strict';
 
-// Funkcja do kapitalizacji pierwszej litery
+// Funkcja kapitalizująca tekst
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Funkcja poprawiająca formularz
+// Funkcja naprawiająca formularz: dodaje label i placeholder
 function fixForm(formElement) {
   const inputs = formElement.querySelectorAll('input');
 
   inputs.forEach((input) => {
-    const container = input.parentElement; // unikalna nazwa, nie parent
+    const parentContainer = input.parentNode;
 
     // Tworzymy label
     const label = document.createElement('label');
@@ -18,10 +18,10 @@ function fixForm(formElement) {
     label.setAttribute('for', input.id);
     label.textContent = capitalize(input.name);
 
-    // Wstawiamy label przed inputem
-    container.insertBefore(label, input);
+    // Wstawiamy label przed input
+    parentContainer.insertBefore(label, input);
 
-    // Dodajemy placeholder
+    // Ustawiamy placeholder
     input.placeholder = capitalize(input.name);
   });
 }
