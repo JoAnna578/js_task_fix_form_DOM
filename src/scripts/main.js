@@ -5,29 +5,32 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Funkcja do naprawy formularza
+// Funkcja poprawiająca pojedynczy formularz
 function fixForm(form) {
   const inputs = form.querySelectorAll('input');
 
   inputs.forEach((input) => {
-    const container = input.parentElement;
+    const parent = input.parentElement;
 
-    // Tworzymy element label
+    // Tworzymy label
     const label = document.createElement('label');
     label.className = 'field-label';
     label.setAttribute('for', input.id);
     label.textContent = capitalize(input.name);
 
-    // Wstawiamy label PRZED input
-    container.insertBefore(label, input);
+    // Wstawiamy label przed inputem
+    parent.insertBefore(label, input);
 
-    // Ustawiamy placeholder
+    // Dodajemy placeholder
     input.placeholder = capitalize(input.name);
   });
 }
 
-// Udostępniamy funkcję globalnie dla testów
+// Pobranie wszystkich formularzy na stronie i ich poprawienie
+const forms = document.querySelectorAll('form');
+forms.forEach((form) => fixForm(form));
+
+// Udostępnienie funkcji globalnie dla testów
 window.fixForm = fixForm;
-window.capitalize = capitalize;
 
 
