@@ -1,24 +1,33 @@
+'use strict';
+
+// Funkcja do poprawienia formularza
 function fixForm(form) {
   Array.from(form.elements).forEach((input) => {
+    // Pomijamy elementy bez nazwy
     if (!input.name) return;
 
-    const parent = input.parentNode;
+    // Pobranie kontenera inputa
+    const fieldContainer = input.parentNode;
 
+    // Tworzenie label
     const label = document.createElement('label');
     label.className = 'field-label';
     label.setAttribute('for', input.id);
     label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
 
-    // Poprawka: wstaw label przed input zamiast na końcu
-    parent.insertBefore(label, input);
+    // Wstaw label przed input
+    fieldContainer.insertBefore(label, input);
 
-    // Ustaw placeholder
+    // Ustawienie placeholdera
     input.placeholder = input.name.charAt(0).toUpperCase() + input.name.slice(1);
   });
 }
 
-// Wywołanie funkcji dla wszystkich formularzy
-document.querySelectorAll('form').forEach((form) => fixForm(form));
+// Pobranie wszystkich formularzy na stronie
+const forms = document.querySelectorAll('form');
+
+// Wywołanie funkcji dla każdego formularza
+forms.forEach((form) => fixForm(form));
 
 // Udostępnienie funkcji globalnie dla testów
 window.fixForm = fixForm;
