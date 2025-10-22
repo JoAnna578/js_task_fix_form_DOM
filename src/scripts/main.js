@@ -12,7 +12,7 @@
 
     // Pobieramy wszystkie inputy z name, pomijamy buttony i hidden
     const fields = formEl.querySelectorAll(
-      'input[name]:not([type="submit"]):not([type="button"]):not([type="hidden"])'
+      'input[name]:not([type=submit]):not([type=button]):not([type=hidden])'
     );
 
     Array.from(fields).forEach((field) => {
@@ -21,13 +21,12 @@
 
       // Sprawdzenie, czy label już istnieje
       const prev = field.previousElementSibling;
-      const prevIsLabel =
+      if (
         prev &&
         prev.tagName &&
         prev.tagName.toLowerCase() === 'label' &&
-        prev.getAttribute('for') === field.id;
-
-      if (prevIsLabel) {
+        prev.getAttribute('for') === field.id
+      ) {
         if (!field.placeholder) field.placeholder = cap(fldName);
         return;
       }
