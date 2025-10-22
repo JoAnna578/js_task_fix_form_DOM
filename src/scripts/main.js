@@ -1,18 +1,48 @@
-function fixForm(form) {
-  Array.from(form.elements).forEach((input) => {
-    if (!input.name) return;
+'use strict';
 
-    const parent = input.parentNode;
+(function() {
+  // Funkcja kapitalizująca pierwszy znak
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
-    const label = document.createElement('label');
-    label.className = 'field-label';
-    label.setAttribute('for', input.id);
-    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+  // Pobranie wszystkich formularzy
+  const forms = document.querySelectorAll('form');
 
-    // Wstaw label przed input
-    parent.insertBefore(label, input);
+  forms.forEach((form) => {
+    Array.from(form.elements).forEach((input) => {
+      if (!input.name) return; // pomijamy inputy bez name
 
-    // Ustaw placeholder
-    input.placeholder = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+      // Tworzymy label
+      const lbl = document.createElement('label');
+      lbl.className = 'field-label';
+      lbl.setAttribute('for', input.id);
+      lbl.textContent = capitalize(input.name);
+
+      // Wstawiamy label **przed** input
+      input.parentNode.insertBefore(lbl, input);
+
+      // Ustawiamy placeholder
+      input.placeholder = capitalize(input.name);
+    });
   });
-}
+
+  // Funkcja dostępna globalnie dla testów
+  window.fixForm = function() {
+    // Funkcja może być wywołana ponownie, np. w testach
+    forms.forEach((form) => {
+      Array.from(form.elements).forEach((input) => {
+        if (!input.name) return;
+        // Sprawdzenie czy label już istnieje, by nie dublować
+        if (!input.previousElementSibling || input.previousElementSibling.tagName.toLowerCase() !== 'label') {
+          const lbl = document.createElement('label');
+          lbl.className = 'field-label';
+          lbl.setAttribute('for', input.id);
+          lbl.textContent = capitalize(input.name);
+          input.parentNode.insertBefore(lbl, input);
+        }
+        input.placeholder = capitalize(input.name);
+      });
+    });
+  };
+})();
