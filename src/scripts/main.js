@@ -1,59 +1,39 @@
 'use strict';
 
 (function () {
-  // Funkcja do kapitalizacji pierwszej litery i rozdzielania nazw camelCase
-  function cap(s) {
-    // Zamienia firstName → First Name
-    return String(s)
-      .replace(/([A-Z])/g, ' $1')   // wstawia spacje przed dużymi literami
-      .replace(/^./, (c) => c.toUpperCase()); // pierwsza litera duża
+  function formatLabel(s) {
+    return s
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (c) => c.toUpperCase());
   }
 
-  // Funkcja poprawiająca formularz
   function fixForm(formEl) {
     if (!formEl || !formEl.querySelectorAll) return;
 
-    // Pobieramy wszystkie inputy z name, pomijamy buttony i hidden
-    const fields = formEl.querySelectorAll(
+    const inputs = formEl.querySelectorAll(
       'input[name]:not([type=submit]):not([type=button]):not([type=hidden])'
     );
 
-    Array.from(fields).forEach((field) => {
-      const fldName = field.getAttribute('name');
-      if (!fldName) return;
+    inputs.forEach((input) => {
+      const name = input.getAttribute('name');
+      if (!name) return;
 
-      // Sprawdzenie, czy label już istnieje
-      const prev = field.previousElementSibling;
-      if (
-        prev &&
-        prev.tagName &&
-        prev.tagName.toLowerCase() === 'label' &&
-        prev.getAttribute('for') === field.id
-      ) {
-        if (!field.placeholder) field.placeholder = cap(fldName);
+      const prev = input.previousElementSibling;
+      if (prev && prev.tagName.toLowerCase() === 'label' && prev.getAttribute('for') === input.id) {
+        if (!input.placeholder) input.placeholder = formatLabel(name);
         return;
       }
 
-      // Tworzymy label
-      const lbl = document.createElement('label');
-      lbl.className = 'field-label';
-      if (field.id) lbl.setAttribute('for', field.id);
-      lbl.textContent = cap(fldName);
+      const label = document.createElement('label');
+      label.className = 'field-label';
+      if (input.id) label.setAttribute('for', input.id);
+      label.textContent = formatLabel(name);
 
-      // Wstawiamy label przed input
-      field.insertAdjacentElement('beforebegin', lbl);
+      input.parentElement.prepend(label);
 
-      // Ustawiamy placeholder
-      if (!field.placeholder) field.placeholder = cap(fldName);
+      input.placeholder = formatLabel(name);
     });
   }
 
-  // Udostępniamy funkcję globalnie dla testów
   window.fixForm = fixForm;
-
-  // 💡 Natychmiast poprawiamy wszystkie formularze po załadowaniu DOM
-  document.addEventListener('DOMContentLoaded', () => {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(fixForm);
-  });
 })();
