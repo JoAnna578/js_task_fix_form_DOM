@@ -1,16 +1,17 @@
 'use strict';
 
 (function () {
-  // Funkcja konwertuje camelCase, snake_case i kebab-case → Title Case
+  // Funkcja konwertuje camelCase, znak "-" lub "_" → Title Case
   function formatLabel(str) {
     if (!str) return '';
-    return str
-      .replace(/[-_]/g, ' ') // zamiana "_" i "-" na spacje
-      .replace(/([A-Z])/g, ' $1') // wstawienie spacji 
+    // Usuń prefiks przed "-" lub "_", jeśli istnieje
+    const parts = str.split(/[-_]/);
+    const lastPart = parts[parts.length - 1];
+    // Zamień "_" lub "-" na spację i kapitalizuj każde słowo
+    return lastPart
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
-      .trim();
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   // Funkcja poprawiająca pojedynczy formularz
@@ -21,35 +22,38 @@
       'input[name]:not([type=submit]):not([type=button]):not([type=hidden])'
     );
 
-    inputs.forEach(input => {
-      const inputName = input.getAttribute('name');
+    inputs.forEach((inputEl) => {
+      const inputName = inputEl.getAttribute('name');
       if (!inputName) return;
 
-      // Tworzymy poprawny label
+      // Sprawdzenie, czy label już istnieje dla tego inputa
+      let existingLabel = inputEl.previousElementSibling;
+      if (
+        existingLabel &&
+        existingLabel.tagName.toLowerCase() === 'label' &&
+        existingLabel.getAttribute('for') === inputEl.id
+      ) {
+        // Zaktualizuj placeholder, jeśli jest pusty
+        if (!inputEl.placeholder) {
+          inputEl.placeholder = formatLabel(inputName);
+        }
+        return;
+      }
+
+      // Tworzymy nowy label
       const label = document.createElement('label');
       label.className = 'field-label';
-      if (input.id) label.setAttribute('for', input.id);
+      label.setAttribute('for', inputEl.id);
       label.textContent = formatLabel(inputName);
 
-      // Sprawdzenie: jeśli label już istnieje, usuń go (aby uniknąć duplikatów)
-      const existingLabel = input.parentElement.querySelector('label');
-      if (existingLabel) existingLabel.remove();
+      // Wstawiamy label przed input
+      inputEl.parentElement.insertBefore(label, inputEl);
 
-      // Wstaw label przed inputem
-      input.parentElement.insertBefore(label, input);
-
-      // Ustaw placeholder
-      input.placeholder = formatLabel(inputName);
+      // Ustawiamy placeholder taki sam jak label
+      inputEl.placeholder = formatLabel(inputName);
     });
   }
 
   // Udostępniamy funkcję globalnie dla testów Mate Academy
   window.fixForm = fixForm;
-
-  // Popraw wszystkie formularze po załadowaniu DOM
-  document.addEventListener('DOMContentLoaded', () => {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(fixForm);
-  });
 })();
-
