@@ -1,59 +1,20 @@
-'use strict';
+function formatLabel(str) {
+  if (!str) return '';
 
-(function () {
-  // Funkcja konwertuje camelCase, znak "-" lub "_" → Title Case
-  function formatLabel(str) {
-    if (!str) return '';
-    // Usuń prefiks przed "-" lub "_", jeśli istnieje
-    const parts = str.split(/[-_]/);
-    const lastPart = parts[parts.length - 1];
-    // Zamień "_" lub "-" na spację i kapitalizuj każde słowo
-    return lastPart
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
+  // Usuń prefiks przed pierwszym '-' lub '_'
+  str = str.replace(/^[^-_]+[-_]/, '');
 
-  // Funkcja poprawiająca pojedynczy formularz
-  function fixForm(formEl) {
-    if (!formEl || !formEl.querySelectorAll) return;
+  // Zamień '_' i '-' na spacje
+  str = str.replace(/[-_]/g, ' ');
 
-    const inputs = formEl.querySelectorAll(
-      'input[name]:not([type=submit]):not([type=button]):not([type=hidden])'
-    );
+  // Rozbij camelCase przez dodanie spacji przed wielką literą
+  str = str.replace(/([a-z])([A-Z])/g, '$1 $2');
 
-    inputs.forEach((inputEl) => {
-      const inputName = inputEl.getAttribute('name');
-      if (!inputName) return;
+  // Title Case: każde słowo z dużej litery
+  str = str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 
-      // Sprawdzenie, czy label już istnieje dla tego inputa
-      let existingLabel = inputEl.previousElementSibling;
-      if (
-        existingLabel &&
-        existingLabel.tagName.toLowerCase() === 'label' &&
-        existingLabel.getAttribute('for') === inputEl.id
-      ) {
-        // Zaktualizuj placeholder, jeśli jest pusty
-        if (!inputEl.placeholder) {
-          inputEl.placeholder = formatLabel(inputName);
-        }
-        return;
-      }
-
-      // Tworzymy nowy label
-      const label = document.createElement('label');
-      label.className = 'field-label';
-      label.setAttribute('for', inputEl.id);
-      label.textContent = formatLabel(inputName);
-
-      // Wstawiamy label przed input
-      inputEl.parentElement.insertBefore(label, inputEl);
-
-      // Ustawiamy placeholder taki sam jak label
-      inputEl.placeholder = formatLabel(inputName);
-    });
-  }
-
-  // Udostępniamy funkcję globalnie dla testów Mate Academy
-  window.fixForm = fixForm;
-})();
+  return str.trim();
+}
