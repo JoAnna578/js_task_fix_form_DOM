@@ -32,7 +32,7 @@
       const nameAttr = inputEl.getAttribute('name');
       if (!nameAttr) return;
 
-      // Upewnij się, że input ma unikalne id
+      // Upewnij się, że input ma id
       if (!inputEl.id) {
         const safeName = nameAttr.replace(/[^a-z0-9_-]/gi, '');
         inputEl.id = safeName ? `${safeName}-${index}` : `input-${index}`;
@@ -48,24 +48,32 @@
         prevLabel.getAttribute('for') === inputEl.id
       ) {
         // Aktualizujemy placeholder, jeśli jest pusty
-        inputEl.placeholder = computedLabel;
-      } else {
-        // Tworzymy nowy label
-        const label = document.createElement('label');
-        label.className = 'field-label';
-        label.setAttribute('for', inputEl.id);
-        label.textContent = computedLabel;
-
-        // Wstawiamy label przed input
-        inputEl.parentElement.insertBefore(label, inputEl);
-
-        // Ustawiamy placeholder taki sam jak label
-        inputEl.placeholder = computedLabel;
+        if (!inputEl.placeholder) {
+          inputEl.placeholder = computedLabel;
+        }
+        return;
       }
+
+      // Tworzymy nowy label
+      const label = document.createElement('label');
+      label.className = 'field-label';
+      label.setAttribute('for', inputEl.id);
+      label.textContent = computedLabel;
+
+      // Wstawiamy label przed input
+      inputEl.parentElement.insertBefore(label, inputEl);
+
+      // Ustawiamy placeholder taki sam jak label
+      inputEl.placeholder = computedLabel;
     });
   }
 
-  // Udostępniamy funkcję globalnie dla testów
+  // Udostępniamy funkcję globalnie dla testów Mate Academy
   window.fixForm = fixForm;
-  window.formatLabel = formatLabel;
+
+  // Wywołanie funkcji dla pierwszego formularza na stronie
+  const formToFix = document.querySelector('form');
+  if (formToFix) {
+    fixForm(formToFix);
+  }
 })();
