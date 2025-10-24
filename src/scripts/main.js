@@ -4,7 +4,7 @@
   // Funkcja konwertuje camelCase → First Name
   function formatLabel(str) {
     return str
-      .replace(/([A-Z])/g, ' $1')   // wstawia spację przed dużą literą
+      .replace(/([A-Z])/g, ' $1')   // wstawia spację przed dużymi literami
       .replace(/^./, (c) => c.toUpperCase()); // pierwsza litera duża
   }
 
