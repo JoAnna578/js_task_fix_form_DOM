@@ -1,9 +1,12 @@
 'use strict';
 
 (function () {
-  // Funkcja do kapitalizacji pierwszej litery
+  // Funkcja do kapitalizacji pierwszej litery i rozdzielania nazw camelCase
   function cap(s) {
-    return String(s).charAt(0).toUpperCase() + String(s).slice(1);
+    // Zamienia firstName → First Name
+    return String(s)
+      .replace(/([A-Z])/g, ' $1')   // wstawia spacje przed dużymi literami
+      .replace(/^./, (c) => c.toUpperCase()); // pierwsza litera duża
   }
 
   // Funkcja poprawiająca formularz
@@ -40,11 +43,17 @@
       // Wstawiamy label przed input
       field.insertAdjacentElement('beforebegin', lbl);
 
-      // Ustawiamy placeholder jeśli nie istnieje
+      // Ustawiamy placeholder
       if (!field.placeholder) field.placeholder = cap(fldName);
     });
   }
 
   // Udostępniamy funkcję globalnie dla testów
   window.fixForm = fixForm;
+
+  // 💡 Natychmiast poprawiamy wszystkie formularze po załadowaniu DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(fixForm);
+  });
 })();
