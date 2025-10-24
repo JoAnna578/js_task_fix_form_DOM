@@ -1,12 +1,14 @@
 'use strict';
 
 (function () {
-  function formatLabel(s) {
-    return s
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (c) => c.toUpperCase());
+  // Funkcja konwertuje camelCase → First Name
+  function formatLabel(str) {
+    return str
+      .replace(/([A-Z])/g, ' $1')   // wstawia spację przed dużą literą
+      .replace(/^./, (c) => c.toUpperCase()); // pierwsza litera duża
   }
 
+  // Funkcja poprawiająca pojedynczy formularz
   function fixForm(formEl) {
     if (!formEl || !formEl.querySelectorAll) return;
 
@@ -14,26 +16,35 @@
       'input[name]:not([type=submit]):not([type=button]):not([type=hidden])'
     );
 
-    inputs.forEach((input) => {
-      const name = input.getAttribute('name');
-      if (!name) return;
+    inputs.forEach((inputEl) => {
+      const inputName = inputEl.getAttribute('name'); // ✅ nie używamy 'name'
+      if (!inputName) return;
 
-      const prev = input.previousElementSibling;
-      if (prev && prev.tagName.toLowerCase() === 'label' && prev.getAttribute('for') === input.id) {
-        if (!input.placeholder) input.placeholder = formatLabel(name);
+      // Jeśli label już istnieje, ustaw tylko placeholder
+      const prevLabel = inputEl.previousElementSibling;
+      if (
+        prevLabel &&
+        prevLabel.tagName.toLowerCase() === 'label' &&
+        prevLabel.getAttribute('for') === inputEl.id
+      ) {
+        if (!inputEl.placeholder) inputEl.placeholder = formatLabel(inputName);
         return;
       }
 
+      // Tworzymy label
       const label = document.createElement('label');
       label.className = 'field-label';
-      if (input.id) label.setAttribute('for', input.id);
-      label.textContent = formatLabel(name);
+      if (inputEl.id) label.setAttribute('for', inputEl.id);
+      label.textContent = formatLabel(inputName);
 
-      input.parentElement.prepend(label);
+      // Dodajemy label jako dziecko rodzica inputa
+      inputEl.parentElement.appendChild(label);
 
-      input.placeholder = formatLabel(name);
+      // Ustawiamy placeholder
+      inputEl.placeholder = formatLabel(inputName);
     });
   }
 
+  // Udostępniamy funkcję globalnie dla testów Mate Academy
   window.fixForm = fixForm;
 })();
